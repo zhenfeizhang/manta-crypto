@@ -3,6 +3,7 @@
 name: Check Set-Up & Build
 
 # Controls when the action will run.
+# yamllint disable-line rule:truthy
 on:
   # Triggers the workflow on push or pull request events
   # but only for the calamari (default) branch.
@@ -43,21 +44,20 @@ jobs:
           source ~/.cargo/env
           rustup default nightly
           rustup update nightly
-          rustup target add wasm32-unknown-unknown --toolchain nightly
           rustup component add clippy
           rustup component add rustfmt
       - name: Check Formatting
         run: |
-          cargo fmt --all -- --check
+          cargo +nightly fmt --all -- --check
       - name: Check Clippy
         run: |
           cargo clippy --release
-      - name: Check native Build
+      - name: Check Native Build
         run: |
           cargo check --release
-      - name: Check Wasm Build
+      - name: Check Native Build Without `std`
         run: |
-          cargo +nightly build --target wasm32-unknown-unknown --features=runtime-benchmarks
+          cargo check --release --no-default-features
       - name: Run Tests
         run: |
           cargo test --release
