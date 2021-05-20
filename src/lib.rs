@@ -29,7 +29,7 @@ mod tests;
 
 pub use checksum::Checksum;
 pub use commitment::Commitment;
-pub use constants::{COMMIT_PARAM, HASH_PARAM, RECLAIM_PK, TRANSFER_PK};
+pub use constants::{COMMIT_PARAM, HASH_PARAM};
 pub use ecies::Ecies;
 pub use merkle_tree::MerkleTree;
 pub use param::*;
