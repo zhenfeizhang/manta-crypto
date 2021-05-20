@@ -33,7 +33,7 @@ pub trait Commitment {
 		param: &Self::Param,
 		input: &Self::Input,
 		randomness: &Self::Randomness,
-	) -> Self::Commitment;
+	) -> Result<Self::Commitment, MantaCryptoErrors>;
 
 	/// check the commitment is correct for some given input
 	fn check_commitment(
@@ -41,7 +41,7 @@ pub trait Commitment {
 		input: &Self::Input,
 		randomness: &Self::Randomness,
 		commitment: &Self::Commitment,
-	) -> bool;
+	) -> Result<bool, MantaCryptoErrors>;
 }
 
 impl Commitment for MantaCrypto {
@@ -54,12 +54,12 @@ impl Commitment for MantaCrypto {
 		param: &Self::Param,
 		input: &Self::Input,
 		randomness: &Self::Randomness,
-	) -> Self::Commitment {
-		let open = Randomness(Fr::deserialize(randomness.as_ref()).unwrap());
-		let commit = CommitmentScheme::commit(param, input, &open).unwrap();
+	) -> Result<Self::Commitment, MantaCryptoErrors> {
+		let open = Randomness(Fr::deserialize(randomness.as_ref())?);
+		let commit = CommitmentScheme::commit(param, input, &open)?;
 		let mut commit_bytes = [0u8; 32];
-		commit.serialize(commit_bytes.as_mut()).unwrap();
-		commit_bytes
+		commit.serialize(commit_bytes.as_mut())?;
+		Ok(commit_bytes)
 	}
 
 	fn check_commitment(
@@ -67,7 +67,7 @@ impl Commitment for MantaCrypto {
 		input: &Self::Input,
 		randomness: &Self::Randomness,
 		commitment: &Self::Commitment,
-	) -> bool {
-		Self::commit(param, input, &randomness) == *commitment
+	) -> Result<bool, MantaCryptoErrors> {
+		Ok(Self::commit(param, input, &randomness)? == *commitment)
 	}
 }

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with manta-crypto.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::{param::*, serdes::MantaSerDes};
+use crate::{param::*, serdes::MantaSerDes, MantaCryptoErrors};
 use ark_crypto_primitives::{commitment, crh};
 use ark_ed_on_bls12_381::EdwardsProjective;
 use ark_std::vec::Vec;
@@ -23,52 +23,52 @@ use blake2::{Blake2s, Digest};
 /// Manta's native checksum trait.
 pub trait Checksum {
 	/// Generate a unique checksum for a give data struct.
-	fn get_checksum(&self) -> [u8; 32];
+	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors>;
 }
 impl Checksum for crh::pedersen::Parameters<EdwardsProjective> {
-	fn get_checksum(&self) -> [u8; 32] {
+	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors> {
 		let mut buf: Vec<u8> = Vec::new();
-		self.serialize(&mut buf);
+		self.serialize(&mut buf)?;
 		let mut hasher = Blake2s::new();
 		hasher.update(buf);
 		let digest = hasher.finalize();
 		let mut res = [0u8; 32];
 		res.copy_from_slice(digest.as_slice());
-		res
+		Ok(res)
 	}
 }
 
 impl Checksum for commitment::pedersen::Parameters<EdwardsProjective> {
-	fn get_checksum(&self) -> [u8; 32] {
+	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors> {
 		let mut buf: Vec<u8> = Vec::new();
-		self.serialize(&mut buf);
+		self.serialize(&mut buf)?;
 		let mut hasher = Blake2s::new();
 		hasher.update(buf);
 		let digest = hasher.finalize();
 		let mut res = [0u8; 32];
 		res.copy_from_slice(digest.as_slice());
-		res
+		Ok(res)
 	}
 }
 
 impl Checksum for VerificationKey {
-	fn get_checksum(&self) -> [u8; 32] {
+	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors> {
 		let mut hasher = Blake2s::new();
 		hasher.update(&self.data);
 		let digest = hasher.finalize();
 		let mut res = [0u8; 32];
 		res.copy_from_slice(digest.as_slice());
-		res
+		Ok(res)
 	}
 }
 
 impl Checksum for Parameter {
-	fn get_checksum(&self) -> [u8; 32] {
+	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors> {
 		let mut hasher = Blake2s::new();
 		hasher.update(&self.data);
 		let digest = hasher.finalize();
 		let mut res = [0u8; 32];
 		res.copy_from_slice(digest.as_slice());
-		res
+		Ok(res)
 	}
 }

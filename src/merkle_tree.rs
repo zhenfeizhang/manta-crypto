@@ -24,10 +24,16 @@ pub trait MerkleTree {
 	type Tree;
 
 	/// build a merkle tree from the leaves
-	fn build_tree(hash_param: Self::Param, leaves: &[Self::Leaf]) -> Self::Tree;
+	fn build_tree(
+		hash_param: Self::Param,
+		leaves: &[Self::Leaf],
+	) -> Result<Self::Tree, MantaCryptoErrors>;
 
 	/// get the root of the merkle tree
-	fn root(hash_param: Self::Param, payload: &[Self::Leaf]) -> Self::Root;
+	fn root(
+		hash_param: Self::Param,
+		payload: &[Self::Leaf],
+	) -> Result<Self::Root, MantaCryptoErrors>;
 }
 
 impl MerkleTree for MantaCrypto {
@@ -37,18 +43,25 @@ impl MerkleTree for MantaCrypto {
 	type Tree = LedgerMerkleTree;
 
 	/// build a merkle tree from the leaves
-	fn build_tree(hash_param: Self::Param, leaves: &[Self::Leaf]) -> Self::Tree {
-		LedgerMerkleTree::new(hash_param, leaves).unwrap()
+	fn build_tree(
+		hash_param: Self::Param,
+		leaves: &[Self::Leaf],
+	) -> Result<Self::Tree, MantaCryptoErrors> {
+		let tree = LedgerMerkleTree::new(hash_param, leaves)?;
+		Ok(tree)
 	}
 
 	/// Give a slice of the `payload`, and a hash function defined by the `hash_param`,
 	/// build a merkle tree, and output the root of the tree.
-	fn root(hash_param: Self::Param, leaves: &[Self::Leaf]) -> Self::Root {
-		let tree = Self::build_tree(hash_param, leaves);
+	fn root(
+		hash_param: Self::Param,
+		leaves: &[Self::Leaf],
+	) -> Result<Self::Root, MantaCryptoErrors> {
+		let tree = Self::build_tree(hash_param, leaves)?;
 		let root = tree.root();
 
 		let mut bytes = [0u8; 32];
-		root.serialize(bytes.as_mut()).unwrap();
-		bytes
+		root.serialize(bytes.as_mut())?;
+		Ok(bytes)
 	}
 }
