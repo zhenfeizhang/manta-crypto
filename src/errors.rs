@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with manta-crypto.  If not, see <http://www.gnu.org/licenses/>.
 
-use ark_crypto_primitives::Error as CryptoError;
+use ark_crypto_primitives::Error as StdError;
+use ark_crypto_primitives::CryptoError as CryptoError;
 use ark_std::io::Error as IoError;
 use ark_serialize::SerializationError;
 use ark_std::fmt;
@@ -25,6 +26,7 @@ pub enum MantaCryptoErrors {
 	ChecksumFail,
 	ArkSerialError(SerializationError),
 	ArkCryptoError(CryptoError),
+	ArkStdError(StdError),
 	ArkIoError(IoError),
 }
 
@@ -42,6 +44,12 @@ impl From<CryptoError> for MantaCryptoErrors {
 	}
 }
 
+impl From<StdError> for MantaCryptoErrors {
+	fn from(e: StdError) -> MantaCryptoErrors {
+		MantaCryptoErrors::ArkStdError(e)
+	}
+}
+
 impl From<IoError> for MantaCryptoErrors {
 	fn from(e: IoError) -> MantaCryptoErrors {
 		MantaCryptoErrors::ArkIoError(e)
@@ -56,6 +64,7 @@ impl fmt::Display for MantaCryptoErrors {
 			Self::ArkSerialError(err) => write!(f, "Ark serial error {:?}", err),
 			Self::ArkIoError(err) => write!(f, "I/O error: {:?}", err),
 			Self::ArkCryptoError(err) => write!(f, "Ark crypto error: {:?}", err),
+			Self::ArkStdError(err) => write!(f, "Ark std error: {:?}", err),
 		}
 	}
 }
