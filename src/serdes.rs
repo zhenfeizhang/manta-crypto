@@ -17,23 +17,24 @@
 use crate::param::*;
 use ark_crypto_primitives::{commitment, crh};
 use ark_ed_on_bls12_381::EdwardsProjective;
-use ark_serialize::{CanonicalDeserialize, CanonicalSerialize, SerializationError};
+use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::{
 	io::{Read, Write},
 	vec::Vec,
 };
+use crate::MantaCryptoErrors;
 
 /// Manta's native (de)serialization trait.
 pub trait MantaSerDes: Sized {
 	/// Serialize a struct into a writable blob.
-	fn serialize<W: Write>(&self, writer: W) -> Result<(), SerializationError>;
+	fn serialize<W: Write>(&self, writer: W) -> Result<(), MantaCryptoErrors>;
 	/// Deserialize a readable data into a struct.
-	fn deserialize<R: Read>(reader: R) -> Result<Self, SerializationError>;
+	fn deserialize<R: Read>(reader: R) -> Result<Self, MantaCryptoErrors>;
 }
 
 impl MantaSerDes for crh::pedersen::Parameters<EdwardsProjective> {
 	/// serialize the hash parameters without compression
-	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), SerializationError> {
+	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), MantaCryptoErrors> {
 		for generators in self.generators.iter() {
 			for gen in generators {
 				gen.serialize_uncompressed(&mut writer)?;
@@ -46,7 +47,7 @@ impl MantaSerDes for crh::pedersen::Parameters<EdwardsProjective> {
 	/// warning: for efficiency reasons, we do not check the validity of deserialized elements
 	/// the caller should check the CheckSum of the parameters to make sure
 	/// they are consistent with the version used by the ledger.
-	fn deserialize<R: Read>(mut reader: R) -> Result<Self, SerializationError> {
+	fn deserialize<R: Read>(mut reader: R) -> Result<Self, MantaCryptoErrors> {
 		let window = PERDERSON_WINDOW_SIZE;
 		let len = PERDERSON_WINDOW_NUM;
 
@@ -65,7 +66,7 @@ impl MantaSerDes for crh::pedersen::Parameters<EdwardsProjective> {
 
 impl MantaSerDes for commitment::pedersen::Parameters<EdwardsProjective> {
 	/// Serialize the commitment parameters without data compression.
-	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), SerializationError> {
+	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), MantaCryptoErrors> {
 		for generators in self.generators.iter() {
 			for gen in generators {
 				gen.serialize_uncompressed(&mut writer)?
@@ -81,7 +82,7 @@ impl MantaSerDes for commitment::pedersen::Parameters<EdwardsProjective> {
 	/// __Warning__: for efficiency reasons, we do not check the validity of deserialized elements.
 	/// The caller should check the CheckSum of the parameters to make sure
 	/// they are consistent with the version used by the ledger.
-	fn deserialize<R: Read>(mut reader: R) -> Result<Self, SerializationError> {
+	fn deserialize<R: Read>(mut reader: R) -> Result<Self, MantaCryptoErrors> {
 		let window = PERDERSON_WINDOW_SIZE;
 		let len = PERDERSON_WINDOW_NUM;
 
