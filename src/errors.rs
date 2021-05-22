@@ -14,11 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with manta-crypto.  If not, see <http://www.gnu.org/licenses/>.
 
-use ark_crypto_primitives::Error as StdError;
-use ark_crypto_primitives::CryptoError as CryptoError;
-use ark_std::io::Error as IoError;
+use ark_crypto_primitives::{CryptoError, Error as StdError};
 use ark_serialize::SerializationError;
-use ark_std::fmt;
+use ark_std::{fmt, io::Error as IoError};
 
 /// This is an error that could occur within manta-crypto
 #[derive(Debug)]
@@ -55,7 +53,6 @@ impl From<IoError> for MantaCryptoErrors {
 		MantaCryptoErrors::ArkIoError(e)
 	}
 }
-
 
 impl fmt::Display for MantaCryptoErrors {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
