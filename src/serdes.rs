@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with manta-crypto.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::param::*;
+use crate::{param::*, MantaCryptoErrors};
 use ark_crypto_primitives::{commitment, crh};
 use ark_ed_on_bls12_381::EdwardsProjective;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
@@ -22,7 +22,6 @@ use ark_std::{
 	io::{Read, Write},
 	vec::Vec,
 };
-use crate::MantaCryptoErrors;
 
 /// Manta's native (de)serialization trait.
 pub trait MantaSerDes: Sized {

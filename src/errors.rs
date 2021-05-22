@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with manta-crypto.  If not, see <http://www.gnu.org/licenses/>.
 
-use ark_crypto_primitives::Error;
+use ark_crypto_primitives::Error as CryptoError;
+use ark_std::io::Error as IoError;
 use ark_serialize::SerializationError;
 use ark_std::fmt;
 
@@ -23,7 +24,8 @@ use ark_std::fmt;
 pub enum MantaCryptoErrors {
 	ChecksumFail,
 	ArkSerialError(SerializationError),
-	ArkCryptoError(Error),
+	ArkCryptoError(CryptoError),
+	ArkIoError(IoError),
 }
 
 impl ark_std::error::Error for MantaCryptoErrors {}
@@ -34,17 +36,25 @@ impl From<SerializationError> for MantaCryptoErrors {
 	}
 }
 
-impl From<Error> for MantaCryptoErrors {
-	fn from(e: Error) -> MantaCryptoErrors {
+impl From<CryptoError> for MantaCryptoErrors {
+	fn from(e: CryptoError) -> MantaCryptoErrors {
 		MantaCryptoErrors::ArkCryptoError(e)
 	}
 }
+
+impl From<IoError> for MantaCryptoErrors {
+	fn from(e: IoError) -> MantaCryptoErrors {
+		MantaCryptoErrors::ArkIoError(e)
+	}
+}
+
 
 impl fmt::Display for MantaCryptoErrors {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
 		match self {
 			Self::ChecksumFail => write!(f, "Checksum failed"),
-			Self::ArkSerialError(err) => write!(f, "I/O error: {:?}", err),
+			Self::ArkSerialError(err) => write!(f, "Ark serial error {:?}", err),
+			Self::ArkIoError(err) => write!(f, "I/O error: {:?}", err),
 			Self::ArkCryptoError(err) => write!(f, "Ark crypto error: {:?}", err),
 		}
 	}
