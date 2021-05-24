@@ -29,6 +29,9 @@ x25519-dalek = { version = "1.1.0", default-features = false, features = [ "u64_
 generic-array = { version = "0.14.0", default-features = false }
 blake2 = { version = "0.9.1", default-features = false }
 
+# Manta dependencies
+manta-errors = { git = "https://github.com/Manta-Network/manta-errors", default-features = false }
+
 
 [dev-dependencies]
 rand_chacha = { version = "0.2", default-features = false }

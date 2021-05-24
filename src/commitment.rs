@@ -21,6 +21,7 @@ use ark_crypto_primitives::{
 use ark_ed_on_bls12_381::Fr;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::vec::Vec;
+use manta_errors::MantaErrors;
 
 pub trait Commitment {
 	type Param;
@@ -33,7 +34,7 @@ pub trait Commitment {
 		param: &Self::Param,
 		input: &Self::Input,
 		randomness: &Self::Randomness,
-	) -> Result<Self::Commitment, MantaCryptoErrors>;
+	) -> Result<Self::Commitment, MantaErrors>;
 
 	/// check the commitment is correct for some given input
 	fn check_commitment(
@@ -41,7 +42,7 @@ pub trait Commitment {
 		input: &Self::Input,
 		randomness: &Self::Randomness,
 		commitment: &Self::Commitment,
-	) -> Result<bool, MantaCryptoErrors>;
+	) -> Result<bool, MantaErrors>;
 }
 
 impl Commitment for MantaCrypto {
@@ -54,7 +55,7 @@ impl Commitment for MantaCrypto {
 		param: &Self::Param,
 		input: &Self::Input,
 		randomness: &Self::Randomness,
-	) -> Result<Self::Commitment, MantaCryptoErrors> {
+	) -> Result<Self::Commitment, MantaErrors> {
 		let open = Randomness(Fr::deserialize(randomness.as_ref())?);
 		let commit = CommitmentScheme::commit(param, input, &open)?;
 		let mut commit_bytes = [0u8; 32];
@@ -67,7 +68,7 @@ impl Commitment for MantaCrypto {
 		input: &Self::Input,
 		randomness: &Self::Randomness,
 		commitment: &Self::Commitment,
-	) -> Result<bool, MantaCryptoErrors> {
+	) -> Result<bool, MantaErrors> {
 		Ok(Self::commit(param, input, &randomness)? == *commitment)
 	}
 }

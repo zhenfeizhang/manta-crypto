@@ -14,19 +14,20 @@
 // You should have received a copy of the GNU General Public License
 // along with manta-crypto.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::{param::*, serdes::MantaSerDes, MantaCryptoErrors};
+use crate::{param::*, serdes::MantaSerDes};
 use ark_crypto_primitives::{commitment, crh};
 use ark_ed_on_bls12_381::EdwardsProjective;
 use ark_std::vec::Vec;
 use blake2::{Blake2s, Digest};
+use manta_errors::MantaErrors;
 
 /// Manta's native checksum trait.
 pub trait Checksum {
 	/// Generate a unique checksum for a give data struct.
-	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors>;
+	fn get_checksum(&self) -> Result<[u8; 32], MantaErrors>;
 }
 impl Checksum for crh::pedersen::Parameters<EdwardsProjective> {
-	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors> {
+	fn get_checksum(&self) -> Result<[u8; 32], MantaErrors> {
 		let mut buf: Vec<u8> = Vec::new();
 		self.serialize(&mut buf)?;
 		let mut hasher = Blake2s::new();
@@ -39,7 +40,7 @@ impl Checksum for crh::pedersen::Parameters<EdwardsProjective> {
 }
 
 impl Checksum for commitment::pedersen::Parameters<EdwardsProjective> {
-	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors> {
+	fn get_checksum(&self) -> Result<[u8; 32], MantaErrors> {
 		let mut buf: Vec<u8> = Vec::new();
 		self.serialize(&mut buf)?;
 		let mut hasher = Blake2s::new();
@@ -52,7 +53,7 @@ impl Checksum for commitment::pedersen::Parameters<EdwardsProjective> {
 }
 
 impl Checksum for VerificationKey {
-	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors> {
+	fn get_checksum(&self) -> Result<[u8; 32], MantaErrors> {
 		let mut hasher = Blake2s::new();
 		hasher.update(&self.data);
 		let digest = hasher.finalize();
@@ -63,7 +64,7 @@ impl Checksum for VerificationKey {
 }
 
 impl Checksum for Parameter {
-	fn get_checksum(&self) -> Result<[u8; 32], MantaCryptoErrors> {
+	fn get_checksum(&self) -> Result<[u8; 32], MantaErrors> {
 		let mut hasher = Blake2s::new();
 		hasher.update(&self.data);
 		let digest = hasher.finalize();
