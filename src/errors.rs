@@ -17,6 +17,7 @@
 use ark_crypto_primitives::{CryptoError, Error as StdError};
 use ark_serialize::SerializationError;
 use ark_std::{fmt, io::Error as IoError};
+use ark_relations::r1cs::SynthesisError;
 
 /// This is an error that could occur within manta-crypto
 #[derive(Debug)]
@@ -26,6 +27,7 @@ pub enum MantaCryptoErrors {
 	ArkCryptoError(CryptoError),
 	ArkStdError(StdError),
 	ArkIoError(IoError),
+	ArkSynthesisError(SynthesisError),
 }
 
 impl ark_std::error::Error for MantaCryptoErrors {}
@@ -62,6 +64,7 @@ impl fmt::Display for MantaCryptoErrors {
 			Self::ArkIoError(err) => write!(f, "I/O error: {:?}", err),
 			Self::ArkCryptoError(err) => write!(f, "Ark crypto error: {:?}", err),
 			Self::ArkStdError(err) => write!(f, "Ark std error: {:?}", err),
+			Self::ArkSynthesisError(err) => write!(f, "Ark synthesis error: {:?}", err),
 		}
 	}
 }
