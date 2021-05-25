@@ -327,6 +327,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "displaydoc"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3274a6bc8a6a4521291b53b9dcb8345e963fe931c3fc462a7d3ead71d7ccd30d"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "generic-array"
 version = "0.14.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -377,20 +388,21 @@ dependencies = [
  "ark-std",
  "blake2",
  "generic-array",
- "manta-errors",
+ "manta-error",
  "rand_chacha",
  "x25519-dalek",
 ]
 
 [[package]]
-name = "manta-errors"
+name = "manta-error"
 version = "0.1.0"
-source = "git+https://github.com/Manta-Network/manta-errors#7cb948211292f4c0b7c8a838d2054fa5d939b29e"
+source = "git+https://github.com/Manta-Network/manta-error#595442d1564d7e300ce22310c5a9234bc413c4d3"
 dependencies = [
  "ark-crypto-primitives",
  "ark-relations",
  "ark-serialize",
  "ark-std",
+ "displaydoc",
 ]
 
 [[package]]

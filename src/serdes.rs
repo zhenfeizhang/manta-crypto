@@ -22,19 +22,19 @@ use ark_std::{
 	io::{Read, Write},
 	vec::Vec,
 };
-use manta_errors::MantaErrors;
+use manta_error::MantaError;
 
 /// Manta's native (de)serialization trait.
 pub trait MantaSerDes: Sized {
 	/// Serialize a struct into a writable blob.
-	fn serialize<W: Write>(&self, writer: W) -> Result<(), MantaErrors>;
+	fn serialize<W: Write>(&self, writer: W) -> Result<(), MantaError>;
 	/// Deserialize a readable data into a struct.
-	fn deserialize<R: Read>(reader: R) -> Result<Self, MantaErrors>;
+	fn deserialize<R: Read>(reader: R) -> Result<Self, MantaError>;
 }
 
 impl MantaSerDes for crh::pedersen::Parameters<EdwardsProjective> {
 	/// serialize the hash parameters without compression
-	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), MantaErrors> {
+	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), MantaError> {
 		for generators in self.generators.iter() {
 			for gen in generators {
 				gen.serialize_uncompressed(&mut writer)?;
@@ -47,7 +47,7 @@ impl MantaSerDes for crh::pedersen::Parameters<EdwardsProjective> {
 	/// warning: for efficiency reasons, we do not check the validity of deserialized elements
 	/// the caller should check the CheckSum of the parameters to make sure
 	/// they are consistent with the version used by the ledger.
-	fn deserialize<R: Read>(mut reader: R) -> Result<Self, MantaErrors> {
+	fn deserialize<R: Read>(mut reader: R) -> Result<Self, MantaError> {
 		let window = PERDERSON_WINDOW_SIZE;
 		let len = PERDERSON_WINDOW_NUM;
 
@@ -66,7 +66,7 @@ impl MantaSerDes for crh::pedersen::Parameters<EdwardsProjective> {
 
 impl MantaSerDes for commitment::pedersen::Parameters<EdwardsProjective> {
 	/// Serialize the commitment parameters without data compression.
-	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), MantaErrors> {
+	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), MantaError> {
 		for generators in self.generators.iter() {
 			for gen in generators {
 				gen.serialize_uncompressed(&mut writer)?
@@ -82,7 +82,7 @@ impl MantaSerDes for commitment::pedersen::Parameters<EdwardsProjective> {
 	/// __Warning__: for efficiency reasons, we do not check the validity of deserialized elements.
 	/// The caller should check the CheckSum of the parameters to make sure
 	/// they are consistent with the version used by the ledger.
-	fn deserialize<R: Read>(mut reader: R) -> Result<Self, MantaErrors> {
+	fn deserialize<R: Read>(mut reader: R) -> Result<Self, MantaError> {
 		let window = PERDERSON_WINDOW_SIZE;
 		let len = PERDERSON_WINDOW_NUM;
 
