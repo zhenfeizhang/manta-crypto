@@ -16,10 +16,9 @@
 
 use crate::*;
 use ark_crypto_primitives::{CommitmentScheme, FixedLengthCRH};
-use ark_std::rand::SeedableRng;
+use ark_std::{rand::SeedableRng, vec::Vec};
 use rand_chacha::ChaCha20Rng;
 use x25519_dalek::{PublicKey, StaticSecret};
-use ark_std::vec::Vec;
 
 #[test]
 fn manta_dh() {
