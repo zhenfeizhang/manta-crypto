@@ -37,5 +37,5 @@ manta-errors = { git = "https://github.com/Manta-Network/manta-errors", default-
 rand_chacha = { version = "0.2", default-features = false }
 
 [features]
-default = [ "std" ]
+default = [ ]
 std = [ ]
