@@ -58,6 +58,9 @@ jobs:
       - name: Check Native Build Without `std`
         run: |
           cargo check --release --no-default-features
+      - name: Check Wasm Build
+        run: |
+          cargo +nightly build --target wasm32-unknown-unknown
       - name: Run Tests
         run: |
           cargo test --release
