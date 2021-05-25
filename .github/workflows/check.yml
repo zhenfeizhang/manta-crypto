@@ -44,6 +44,7 @@ jobs:
           source ~/.cargo/env
           rustup default nightly
           rustup update nightly
+          rustup target add wasm32-unknown-unknown --toolchain nightly
           rustup component add clippy
           rustup component add rustfmt
       - name: Check Formatting
