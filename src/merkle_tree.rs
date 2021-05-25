@@ -25,10 +25,8 @@ pub trait MerkleTree {
 	type Tree;
 
 	/// build a merkle tree from the leaves
-	fn build_tree(
-		hash_param: Self::Param,
-		leaves: &[Self::Leaf],
-	) -> Result<Self::Tree, MantaError>;
+	fn build_tree(hash_param: Self::Param, leaves: &[Self::Leaf])
+		-> Result<Self::Tree, MantaError>;
 
 	/// get the root of the merkle tree
 	fn root(hash_param: Self::Param, payload: &[Self::Leaf]) -> Result<Self::Root, MantaError>;
@@ -45,8 +43,7 @@ impl MerkleTree for MantaCrypto {
 		hash_param: Self::Param,
 		leaves: &[Self::Leaf],
 	) -> Result<Self::Tree, MantaError> {
-		let tree = LedgerMerkleTree::new(hash_param, leaves)?;
-		Ok(tree)
+		LedgerMerkleTree::new(hash_param, leaves).map_err(|x| x.into())
 	}
 
 	/// Give a slice of the `payload`, and a hash function defined by the `hash_param`,
