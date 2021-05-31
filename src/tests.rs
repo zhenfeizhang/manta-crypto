@@ -16,7 +16,7 @@
 
 use crate::*;
 use ark_crypto_primitives::{CommitmentScheme, FixedLengthCRH};
-use ark_std::rand::SeedableRng;
+use ark_std::{rand::SeedableRng, vec::Vec};
 use rand_chacha::ChaCha20Rng;
 use x25519_dalek::{PublicKey, StaticSecret};
 
@@ -30,7 +30,6 @@ fn manta_dh() {
 	let receiver_sk_bytes = receiver_sk.to_bytes();
 	let value = 12345678;
 	let cipher: [u8; 48] = <MantaCrypto as Ecies>::encrypt(&receiver_pk_bytes, &value, &mut rng);
-	println!("enc success");
 	let rec_value = <MantaCrypto as Ecies>::decrypt(&receiver_sk_bytes, &cipher);
 	assert_eq!(value, rec_value);
 }
@@ -40,21 +39,21 @@ fn test_param_serdes() {
 	let hash_param_seed = [1u8; 32];
 	let mut rng = ChaCha20Rng::from_seed(hash_param_seed);
 	let hash_param = Hash::setup(&mut rng).unwrap();
-	let mut buf: Vec<u8> = vec![];
+	let mut buf: Vec<u8> = Vec::new();
 
-	hash_param.serialize(&mut buf);
+	hash_param.serialize(&mut buf).unwrap();
 	let buf: &[u8] = buf.as_ref();
-	let hash_param2 = HashParam::deserialize(buf);
+	let hash_param2 = HashParam::deserialize(buf).unwrap();
 	assert_eq!(hash_param.generators, hash_param2.generators);
 
 	let commit_param_seed = [2u8; 32];
 	let mut rng = ChaCha20Rng::from_seed(commit_param_seed);
 	let commit_param = param::CommitmentScheme::setup(&mut rng).unwrap();
-	let mut buf: Vec<u8> = vec![];
+	let mut buf: Vec<u8> = Vec::new();
 
-	commit_param.serialize(&mut buf);
+	commit_param.serialize(&mut buf).unwrap();
 	let buf: &[u8] = buf.as_ref();
-	let commit_param2 = CommitmentParam::deserialize(buf);
+	let commit_param2 = CommitmentParam::deserialize(buf).unwrap();
 	assert_eq!(commit_param.generators, commit_param2.generators);
 	assert_eq!(
 		commit_param.randomness_generator,

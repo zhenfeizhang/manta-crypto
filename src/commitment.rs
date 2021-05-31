@@ -21,6 +21,7 @@ use ark_crypto_primitives::{
 use ark_ed_on_bls12_381::Fr;
 use ark_serialize::{CanonicalDeserialize, CanonicalSerialize};
 use ark_std::vec::Vec;
+use manta_error::MantaError;
 
 pub trait Commitment {
 	type Param;
@@ -33,7 +34,7 @@ pub trait Commitment {
 		param: &Self::Param,
 		input: &Self::Input,
 		randomness: &Self::Randomness,
-	) -> Self::Commitment;
+	) -> Result<Self::Commitment, MantaError>;
 
 	/// check the commitment is correct for some given input
 	fn check_commitment(
@@ -41,7 +42,7 @@ pub trait Commitment {
 		input: &Self::Input,
 		randomness: &Self::Randomness,
 		commitment: &Self::Commitment,
-	) -> bool;
+	) -> Result<bool, MantaError>;
 }
 
 impl Commitment for MantaCrypto {
@@ -54,12 +55,12 @@ impl Commitment for MantaCrypto {
 		param: &Self::Param,
 		input: &Self::Input,
 		randomness: &Self::Randomness,
-	) -> Self::Commitment {
-		let open = Randomness(Fr::deserialize(randomness.as_ref()).unwrap());
-		let commit = CommitmentScheme::commit(param, input, &open).unwrap();
+	) -> Result<Self::Commitment, MantaError> {
+		let open = Randomness(Fr::deserialize(randomness.as_ref())?);
+		let commit = CommitmentScheme::commit(param, input, &open)?;
 		let mut commit_bytes = [0u8; 32];
-		commit.serialize(commit_bytes.as_mut()).unwrap();
-		commit_bytes
+		commit.serialize(commit_bytes.as_mut())?;
+		Ok(commit_bytes)
 	}
 
 	fn check_commitment(
@@ -67,7 +68,7 @@ impl Commitment for MantaCrypto {
 		input: &Self::Input,
 		randomness: &Self::Randomness,
 		commitment: &Self::Commitment,
-	) -> bool {
-		Self::commit(param, input, &randomness) == *commitment
+	) -> Result<bool, MantaError> {
+		Ok(Self::commit(param, input, &randomness)? == *commitment)
 	}
 }

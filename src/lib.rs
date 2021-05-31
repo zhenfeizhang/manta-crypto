@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with manta-crypto.  If not, see <http://www.gnu.org/licenses/>.
-#![cfg_attr(not(feature = "std"), no_std)]
+#![no_std]
 
 mod checksum;
 mod commitment;

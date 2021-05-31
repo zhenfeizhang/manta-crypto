@@ -44,6 +44,7 @@ jobs:
           source ~/.cargo/env
           rustup default nightly
           rustup update nightly
+          rustup target add wasm32-unknown-unknown --toolchain nightly
           rustup component add clippy
           rustup component add rustfmt
       - name: Check Formatting
@@ -58,6 +59,9 @@ jobs:
       - name: Check Native Build Without `std`
         run: |
           cargo check --release --no-default-features
+      - name: Check Wasm Build
+        run: |
+          cargo +nightly build --target wasm32-unknown-unknown
       - name: Run Tests
         run: |
           cargo test --release

@@ -22,30 +22,32 @@ use ark_std::{
 	io::{Read, Write},
 	vec::Vec,
 };
+use manta_error::MantaError;
 
 /// Manta's native (de)serialization trait.
-pub trait MantaSerDes {
+pub trait MantaSerDes: Sized {
 	/// Serialize a struct into a writable blob.
-	fn serialize<W: Write>(&self, writer: W);
+	fn serialize<W: Write>(&self, writer: W) -> Result<(), MantaError>;
 	/// Deserialize a readable data into a struct.
-	fn deserialize<R: Read>(reader: R) -> Self;
+	fn deserialize<R: Read>(reader: R) -> Result<Self, MantaError>;
 }
 
 impl MantaSerDes for crh::pedersen::Parameters<EdwardsProjective> {
 	/// serialize the hash parameters without compression
-	fn serialize<W: Write>(&self, mut writer: W) {
+	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), MantaError> {
 		for generators in self.generators.iter() {
 			for gen in generators {
-				gen.serialize_uncompressed(&mut writer).unwrap()
+				gen.serialize_uncompressed(&mut writer)?;
 			}
 		}
+		Ok(())
 	}
 
 	/// This function deserialize the hash parameters.
 	/// warning: for efficiency reasons, we do not check the validity of deserialized elements
 	/// the caller should check the CheckSum of the parameters to make sure
 	/// they are consistent with the version used by the ledger.
-	fn deserialize<R: Read>(mut reader: R) -> Self {
+	fn deserialize<R: Read>(mut reader: R) -> Result<Self, MantaError> {
 		let window = PERDERSON_WINDOW_SIZE;
 		let len = PERDERSON_WINDOW_NUM;
 
@@ -53,33 +55,34 @@ impl MantaSerDes for crh::pedersen::Parameters<EdwardsProjective> {
 		for _ in 0..len {
 			let mut gen = Vec::new();
 			for _ in 0..window {
-				gen.push(EdwardsProjective::deserialize_unchecked(&mut reader).unwrap())
+				gen.push(EdwardsProjective::deserialize_unchecked(&mut reader)?)
 			}
 			generators.push(gen);
 		}
 
-		Self { generators }
+		Ok(Self { generators })
 	}
 }
 
 impl MantaSerDes for commitment::pedersen::Parameters<EdwardsProjective> {
 	/// Serialize the commitment parameters without data compression.
-	fn serialize<W: Write>(&self, mut writer: W) {
+	fn serialize<W: Write>(&self, mut writer: W) -> Result<(), MantaError> {
 		for generators in self.generators.iter() {
 			for gen in generators {
-				gen.serialize_uncompressed(&mut writer).unwrap()
+				gen.serialize_uncompressed(&mut writer)?
 			}
 		}
 		for rgen in self.randomness_generator.iter() {
-			rgen.serialize_uncompressed(&mut writer).unwrap()
+			rgen.serialize_uncompressed(&mut writer)?
 		}
+		Ok(())
 	}
 
 	/// This function deserialize the hash parameters.
 	/// __Warning__: for efficiency reasons, we do not check the validity of deserialized elements.
 	/// The caller should check the CheckSum of the parameters to make sure
 	/// they are consistent with the version used by the ledger.
-	fn deserialize<R: Read>(mut reader: R) -> Self {
+	fn deserialize<R: Read>(mut reader: R) -> Result<Self, MantaError> {
 		let window = PERDERSON_WINDOW_SIZE;
 		let len = PERDERSON_WINDOW_NUM;
 
@@ -87,19 +90,18 @@ impl MantaSerDes for commitment::pedersen::Parameters<EdwardsProjective> {
 		for _ in 0..len {
 			let mut gen = Vec::new();
 			for _ in 0..window {
-				gen.push(EdwardsProjective::deserialize_unchecked(&mut reader).unwrap())
+				gen.push(EdwardsProjective::deserialize_unchecked(&mut reader)?)
 			}
 			generators.push(gen);
 		}
 		let mut randomness_generator = Vec::new();
 		for _ in 0..252 {
-			randomness_generator
-				.push(EdwardsProjective::deserialize_unchecked(&mut reader).unwrap())
+			randomness_generator.push(EdwardsProjective::deserialize_unchecked(&mut reader)?)
 		}
 
-		Self {
+		Ok(Self {
 			randomness_generator,
 			generators,
-		}
+		})
 	}
 }
