@@ -396,7 +396,7 @@ dependencies = [
 [[package]]
 name = "manta-error"
 version = "0.1.0"
-source = "git+https://github.com/Manta-Network/manta-error#595442d1564d7e300ce22310c5a9234bc413c4d3"
+source = "git+https://github.com/Manta-Network/manta-error?branch=manta#13fe1ace32ee4b4a3b037640c2d4689bbbdb6759"
 dependencies = [
  "ark-crypto-primitives",
  "ark-relations",
