@@ -34,6 +34,6 @@ pub use ecies::Ecies;
 pub use merkle_tree::MerkleTree;
 pub use param::*;
 pub use serdes::MantaSerDes;
-pub use zkp::MantaZKPVerifier;
+pub use zkp::{MantaZKPVerifier, RECLAIM_PK, TRANSFER_PK};
 
 pub struct MantaCrypto;
